@@ -1,25 +1,21 @@
 #ifndef Vector_H
 #define Vector_H
-#include<stddef.h>
+#include<stdint.h>
+#include"mystring.h"
 
 typedef struct
 {
-    char** data;
-    size_t size;
-    size_t capacity;
+    Strng** data;
+    uint32_t size;
+    uint32_t capacity;
 } Vector;
 
-void* safe_malloc(size_t size);
-void* safe_calloc(size_t amout, size_t size);
-void* safe_realloc(void* ptr, size_t size);
+Vector* create(uint32_t initial_capacity);
+void destroy_vector(Vector* vector);
+void clean_vector(Vector* vector);
 
-Vector* create();
-void init(Vector* vector, size_t initial_capacity);
-void destroy(Vector* vector);
-
-void add_back(Vector* vector, char* value);
-char* pop_back(Vector* vector);
-void insert(Vector* vector, size_t index, char* value);
-void erase(Vector* vector, size_t index);
+void add_back(Vector* vector, char* value, uint32_t len);
+void add_new_string(Vector* vector, uint32_t initial_capacity);
+//void insert(Vector* vector, uint32_t index, char* value);
 
 #endif

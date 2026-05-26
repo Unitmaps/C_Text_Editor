@@ -1,63 +1,35 @@
 #define __USE_MINGW_ANSI_STDIO 1
 #include<stdlib.h>
 #include<stdio.h>
+#include<stdint.h>
 #include<string.h>
 #include"vector.h"
-int main() {
-    return 0;
-}
+#include"mystring.h"
 
-void* safe_malloc(size_t size)
-{
-    void* temp = malloc(size);
-    if (temp == NULL)
-    {
-        fprintf(stderr, "Memory allocation error\n");
-        exit(EXIT_FAILURE);
-    }
-    return temp;
-}
-
-void* safe_calloc(size_t amount, size_t size)
-{
-    void* temp = calloc(amount, size);
-    if (temp == NULL)
-    {
-        fprintf(stderr, "Memory allocation error\n");
-        exit(EXIT_FAILURE);
-    }
-    return temp;
-}
-
-void* safe_realloc(void* ptr, size_t size)
-{
-    void* new_ptr = realloc(ptr, size);
-    if (new_ptr == NULL)
-    {
-        fprintf(stderr, "Memory reallocation error");
-        exit(EXIT_FAILURE);
-    }
-    return new_ptr;
-}
-
-Vector* create()
+Vector* create(uint32_t initial_capacity)
 {
     Vector* vector = safe_malloc(sizeof(Vector));
+    vector->data = safe_malloc(sizeof(Strng*) * initial_capacity);
+    vector->size = 0;
+    vector->capacity = initial_capacity;
     return vector;
 }
 
-void init(Vector* vector, size_t initial_capacity)
+void clean_vector(Vector* vector)
 {
-    vector->data = safe_malloc(sizeof(char**) * initial_capacity);
+    for (uint32_t i = 0; i < vector->size; i++)
+    {
+        s_destroy_strng(vector->data[i]);
+        vector->data[i] = NULL;
+    }
     vector->size = 0;
-    vector->capacity = initial_capacity;
 }
 
-void destroy(Vector* vector)
+void destroy_vector(Vector* vector)
 {
-    for (size_t i = 0; i < vector->size; i++)
+    for (uint32_t i = 0; i < vector->size; i++)
     {
-        free(vector->data[i]);
+        s_destroy_strng(vector->data[i]);
         vector->data[i] = NULL;
     }
     free(vector->data);
@@ -66,7 +38,7 @@ void destroy(Vector* vector)
     free(vector);
 }
 
-static void increase(Vector* vector)
+static void increase_vector(Vector* vector)
 {
     if (vector->capacity > 1048576)
     {
@@ -76,41 +48,40 @@ static void increase(Vector* vector)
     {
         vector->capacity *= 2;
     }
-    vector->data = safe_realloc(vector->data, sizeof(char*) * vector->capacity);
+    vector->data = safe_realloc(vector->data, sizeof(Strng*) * vector->capacity);
 }
 
-void add_back(Vector* vector, char* value)
+void add_back(Vector* vector, char* value, uint32_t len)
 {
     if (vector->size + 1 > vector->capacity)
     {
-        increase(vector);
+        increase_vector(vector);
     }
-    vector->data[vector->size] = value;
+    Strng* strng = s_create_strng(1024);
+    s_add_string(strng, value, len);
+    vector->data[vector->size] = strng;
     vector->size++;
 }
 
-char* pop_back(Vector* vector)
+void add_new_string(Vector* vector, uint32_t initial_capacity)
 {
-    char* value = vector->data[vector->size - 1];
-    vector->size--;
-    return value;
+    if (vector->size + 1 > vector->capacity)
+    {
+        increase_vector(vector);
+    }
+    Strng* strng = s_create_strng(initial_capacity);
+    vector->data[vector->size] = strng;
+    vector->size++;
 }
 
-void insert(Vector* vector, size_t index, char* value)
+/*void insert(Vector* vector, uint32_t index, char* value)
 {
     if (vector->size + 1 > vector->capacity)
     {
         increase(vector);
     }
-    size_t elems_to_move = vector->size - index;
-    memmove(vector->data + index + 1, vector->data + index, sizeof(char*) * elems_to_move);
+    uint32_t elems_to_move = vector->size - index;
+    memmove(vector->data + index + 1, vector->data + index, sizeof(Strng*) * elems_to_move);
     vector->data[index] = value;
     vector->size++;
-}
-
-void erase(Vector* vector, size_t index)
-{
-    size_t elems_to_move = vector->size - 1 - index;
-    memmove(vector->data + index, vector->data + index + 1, sizeof(char*) * elems_to_move);
-    vector->size--;
-}
+}*/
