@@ -47,6 +47,7 @@ void load(char* filename, Vector* buff)
     if (!is_file_exist(filename))
     {
         printf("File doesn't exists\n");
+        return;
     }
     FILE* file = fopen(filename, "r");
     if (file == NULL)
@@ -84,14 +85,15 @@ void insert_buff(Vector* buff, uint32_t index, Strng* strng)
     {
         if (counter + strlen(buff->data[i]->str) > index)
         {
-            uint32_t cur_index = index - counter - 1;
+            uint32_t cur_index = index - counter;
             s_insert_string(buff->data[i], cur_index, strng->str, strng->size - 1);
+            counter += strlen(buff->data[i]->str);
             break;
 
         }
         counter += strlen(buff->data[i]->str);
     }
-    if (counter < index)
+    if (counter - 1 < index)
     {
         printf("Index out of range error\n");
         exit(EXIT_FAILURE);

@@ -72,10 +72,12 @@ void interface()
             {
                 clean_screen();
                 uint32_t index;
+                printf("Enter index:\n");
                 scanf("%d", &index);
                 clean_sys_buff();
                 Strng* strng = s_create_strng(1024);
                 char c;
+                printf("Enter string:\n");
                 for (uint16_t i = 0; (c = getchar()) != '\n'; i++)
                 {
                     s_add_char(strng, c);
@@ -86,8 +88,8 @@ void interface()
             case SEARCH:
             {
                 clean_screen();
-                clean_sys_buff();
                 Strng* strng = s_create_strng(1024);
+                printf("Enter a substring:\n");
                 char c;
                 for (uint16_t i = 0; (c = getchar()) != '\n'; i++)
                 {
